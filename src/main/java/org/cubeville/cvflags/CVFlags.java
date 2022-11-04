@@ -13,26 +13,29 @@ import com.sk89q.worldguard.protection.regions.RegionQuery;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.cubeville.cvflags.events.EntityDamageEvent;
+import org.cubeville.cvflags.events.PlayerDeathEvent;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Field;
 
 public final class CVFlags extends JavaPlugin implements Listener {
 
-    private final List<String> FLAG_NAMES = List.of(
-            "dropper", // instakill if any fall dmg is taken and remove the death message
-            "elytra-pvp"
-    );
+    public static boolean isFlagTrue(StateFlag flag, Player player) {
+        ApplicableRegionSet set = getRegionSet(player);
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+        return set.testState(localPlayer, flag);
+    }
 
-    private static final Map<String, StateFlag> CUSTOM_FLAGS = new HashMap<>();
+    public static Object getFlagValue(Flag flag, Player player) {
+        ApplicableRegionSet set = getRegionSet(player);
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+        return set.queryValue(localPlayer, flag);
+    }
 
-    public static boolean shouldFlagApply(String flagName, Player player) {
+    private static ApplicableRegionSet getRegionSet(Player player) {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         RegionQuery query = container.createQuery();
-        ApplicableRegionSet set = query.getApplicableRegions(BukkitAdapter.adapt(player.getLocation()));
-        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-        return set.testState(localPlayer, CUSTOM_FLAGS.get(flagName));
+        return query.getApplicableRegions(BukkitAdapter.adapt(player.getLocation()));
     }
 
     @Override
@@ -42,27 +45,20 @@ public final class CVFlags extends JavaPlugin implements Listener {
         // CODE TAKEN FROM WORLDGUARD API
         // https://worldguard.enginehub.org/en/latest/developer/regions/custom-flags/
 
-        for (String flagName : FLAG_NAMES) {
+        for (Field field : Flags.class.getFields()) {
+            if (!field.getType().equals(Flag.class)) continue;
             FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
             try {
-                // create a new flag with flagName, defaulting to false
-                StateFlag flag = new StateFlag(flagName, false);
-                registry.register(flag);
-                CUSTOM_FLAGS.put(flagName, flag);
+                // create a new flag defined in flags
+                registry.register((Flag<?>) field.get(null));
             } catch (FlagConflictException e) {
-                // some other plugin registered a flag by the same name already.
-                // you can use the existing flag, but this may cause conflicts - be sure to check type
-                Flag<?> existing = registry.get("my-custom-flag");
-                if (existing instanceof StateFlag) {
-                    CUSTOM_FLAGS.put(flagName, (StateFlag) existing);
-                } else {
-                    // types don't match - this is bad news! some other plugin conflicts with you
-                    // hopefully this never actually happens
-                }
+                // some other plugin registered a flag by the same name already, just let it go
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
             }
         }
 
-        getServer().getPluginManager().registerEvents(new DropperFlag(), this);
-        getServer().getPluginManager().registerEvents(new ElytraPVPFlag(), this);
+        getServer().getPluginManager().registerEvents(new EntityDamageEvent(), this);
+        getServer().getPluginManager().registerEvents(new PlayerDeathEvent(), this);
     }
 }
