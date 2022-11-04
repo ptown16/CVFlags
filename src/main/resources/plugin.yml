@@ -1,0 +1,6 @@
+name: CVFlags
+version: 1.18
+main: org.cubeville.cvflags.CVFlags
+api-version: 1.18
+authors: [ Ptown16 ]
+description: Custom WorldGuard Flags for Cubeville
