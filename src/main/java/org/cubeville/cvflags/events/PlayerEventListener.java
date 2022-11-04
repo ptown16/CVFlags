@@ -7,7 +7,7 @@ import org.bukkit.event.Listener;
 import org.cubeville.cvflags.CVFlags;
 import org.cubeville.cvflags.Flags;
 
-public class PlayerDeathEvent implements Listener {
+public class PlayerEventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDeath(org.bukkit.event.entity.PlayerDeathEvent event) {
         Player player = event.getEntity();
