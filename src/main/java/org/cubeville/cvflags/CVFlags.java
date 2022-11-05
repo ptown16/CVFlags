@@ -13,12 +13,15 @@ import com.sk89q.worldguard.protection.regions.RegionQuery;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.cubeville.cvflags.events.EntityEventListener;
-import org.cubeville.cvflags.events.PlayerEventListener;
+import org.cubeville.cvflags.flags.DropperFlag;
+import org.cubeville.cvflags.flags.ElytraPVPFlag;
+import org.cubeville.cvflags.flags.PCheckFlag;
 
 import java.lang.reflect.Field;
 
 public final class CVFlags extends JavaPlugin implements Listener {
+
+    private static CVFlags instance;
 
     public static boolean isFlagTrue(StateFlag flag, Player player) {
         ApplicableRegionSet set = getRegionSet(player);
@@ -60,7 +63,13 @@ public final class CVFlags extends JavaPlugin implements Listener {
     }
 
     public void onEnable() {
-        getServer().getPluginManager().registerEvents(new EntityEventListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerEventListener(), this);
+        instance = this;
+        this.getCommand("ps").setExecutor(new PCheckFlag());
+        getServer().getPluginManager().registerEvents(new DropperFlag(), this);
+        getServer().getPluginManager().registerEvents(new ElytraPVPFlag(), this);
+    }
+
+    public static CVFlags getInstance() {
+        return instance;
     }
 }

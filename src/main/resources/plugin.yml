@@ -5,3 +5,8 @@ api-version: 1.18
 depend: [ WorldGuard ]
 authors: [ Ptown16 ]
 description: Custom WorldGuard Flags for Cubeville
+commands:
+  ps:
+    description: Check the number of players remaining in a nearby game
+    usage: /<command>
+    permission: cvflags.pcheck
