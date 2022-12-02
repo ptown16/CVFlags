@@ -16,6 +16,7 @@ import org.cubeville.cvflags.CVFlags;
 import org.cubeville.cvflags.Flags;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,12 +32,12 @@ public class PCheckFlag implements CommandExecutor {
         }
 
         // okay now the real work begins
-        String checkingRgName = (String) CVFlags.getFlagValue(Flags.PLAYER_CHECK, player);
-        if (checkingRgName == null) {
+        Collection<String> flagResults = (Collection<String>) CVFlags.getFlagValue(Flags.PLAYER_CHECK, player);
+        if (flagResults.size() == 0) {
             player.sendMessage("§cYou must be standing in a region with a valid pcheck flag!");
             return true;
         }
-
+        String checkingRgName = flagResults.stream().findFirst().get();
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         ProtectedRegion region = Objects.requireNonNull(container.get(BukkitAdapter.adapt(player.getWorld()))).getRegion(checkingRgName);
         if (region == null) {

@@ -10,11 +10,13 @@ import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.cubeville.cvflags.flags.DropperFlag;
 import org.cubeville.cvflags.flags.ElytraPVPFlag;
+import org.cubeville.cvflags.flags.EnderChestFlag;
 import org.cubeville.cvflags.flags.PCheckFlag;
 
 import java.lang.reflect.Field;
@@ -24,21 +26,28 @@ public final class CVFlags extends JavaPlugin implements Listener {
     private static CVFlags instance;
 
     public static boolean isFlagTrue(StateFlag flag, Player player) {
-        ApplicableRegionSet set = getRegionSet(player);
+        return isFlagTrue(flag, player, player.getLocation());
+    }
+
+    public static boolean isFlagTrue(StateFlag flag, Player player, Location location) {
+        RegionQuery query = getRegionQuery();
         LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-        return set.testState(localPlayer, flag);
+        return query.testState(BukkitAdapter.adapt(location), localPlayer, flag);
     }
 
     public static Object getFlagValue(Flag flag, Player player) {
-        ApplicableRegionSet set = getRegionSet(player);
-        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-        return set.queryValue(localPlayer, flag);
+        return getFlagValue(flag, player, player.getLocation());
     }
 
-    private static ApplicableRegionSet getRegionSet(Player player) {
+    public static Object getFlagValue(Flag flag, Player player, Location location) {
+        RegionQuery query = getRegionQuery();
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+        return query.queryAllValues(BukkitAdapter.adapt(location), localPlayer, flag);
+    }
+
+    private static RegionQuery getRegionQuery() {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionQuery query = container.createQuery();
-        return query.getApplicableRegions(BukkitAdapter.adapt(player.getLocation()));
+        return container.createQuery();
     }
 
     @Override
@@ -67,6 +76,7 @@ public final class CVFlags extends JavaPlugin implements Listener {
         this.getCommand("ps").setExecutor(new PCheckFlag());
         getServer().getPluginManager().registerEvents(new DropperFlag(), this);
         getServer().getPluginManager().registerEvents(new ElytraPVPFlag(), this);
+        getServer().getPluginManager().registerEvents(new EnderChestFlag(), this);
     }
 
     public static CVFlags getInstance() {
