@@ -23,63 +23,63 @@ import java.lang.reflect.Field;
 
 public final class CVFlags extends JavaPlugin implements Listener {
 
-    private static CVFlags instance;
+        private static CVFlags instance;
 
-    public static boolean isFlagTrue(StateFlag flag, Player player) {
-        return isFlagTrue(flag, player, player.getLocation());
-    }
-
-    public static boolean isFlagTrue(StateFlag flag, Player player, Location location) {
-        RegionQuery query = getRegionQuery();
-        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-        return query.testState(BukkitAdapter.adapt(location), localPlayer, flag);
-    }
-
-    public static Object getFlagValue(Flag flag, Player player) {
-        return getFlagValue(flag, player, player.getLocation());
-    }
-
-    public static Object getFlagValue(Flag flag, Player player, Location location) {
-        RegionQuery query = getRegionQuery();
-        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-        return query.queryAllValues(BukkitAdapter.adapt(location), localPlayer, flag);
-    }
-
-    private static RegionQuery getRegionQuery() {
-        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        return container.createQuery();
-    }
-
-    @Override
-    public void onLoad() {
-
-        // CODE TAKEN FROM WORLDGUARD API
-        // https://worldguard.enginehub.org/en/latest/developer/regions/custom-flags/
-
-        for (Field field : Flags.class.getFields()) {
-            System.out.println(field.getType());
-            if (!(Flag.class.isAssignableFrom(field.getType()))) continue;
-            FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
-            try {
-                // create a new flag defined in flags
-                registry.register((Flag<?>) field.get(null));
-            } catch (FlagConflictException e) {
-                // some other plugin registered a flag by the same name already, just let it go
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+        public static boolean isFlagTrue(StateFlag flag, Player player) {
+                return isFlagTrue(flag, player, player.getLocation());
         }
-    }
 
-    public void onEnable() {
-        instance = this;
-        this.getCommand("ps").setExecutor(new PCheckFlag());
-        getServer().getPluginManager().registerEvents(new DropperFlag(), this);
-        getServer().getPluginManager().registerEvents(new ElytraPVPFlag(), this);
-        getServer().getPluginManager().registerEvents(new EnderChestFlag(), this);
-    }
+        public static boolean isFlagTrue(StateFlag flag, Player player, Location location) {
+                RegionQuery query = getRegionQuery();
+                LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+                return query.testState(BukkitAdapter.adapt(location), localPlayer, flag);
+        }
 
-    public static CVFlags getInstance() {
-        return instance;
-    }
+        public static Object getFlagValue(Flag flag, Player player) {
+                return getFlagValue(flag, player, player.getLocation());
+        }
+
+        public static Object getFlagValue(Flag flag, Player player, Location location) {
+                RegionQuery query = getRegionQuery();
+                LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+                return query.queryAllValues(BukkitAdapter.adapt(location), localPlayer, flag);
+        }
+
+        private static RegionQuery getRegionQuery() {
+                RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+                return container.createQuery();
+        }
+
+        @Override
+        public void onLoad() {
+
+                // CODE TAKEN FROM WORLDGUARD API
+                // https://worldguard.enginehub.org/en/latest/developer/regions/custom-flags/
+
+                for (Field field : Flags.class.getFields()) {
+                        System.out.println(field.getType());
+                        if (!(Flag.class.isAssignableFrom(field.getType()))) continue;
+                        FlagRegistry registry = WorldGuard.getInstance().getFlagRegistry();
+                        try {
+                                // create a new flag defined in flags
+                                registry.register((Flag<?>) field.get(null));
+                        } catch (FlagConflictException e) {
+                                // some other plugin registered a flag by the same name already, just let it go
+                        } catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                        }
+                }
+        }
+
+        public void onEnable() {
+                instance = this;
+                this.getCommand("ps").setExecutor(new PCheckFlag());
+                getServer().getPluginManager().registerEvents(new DropperFlag(), this);
+                getServer().getPluginManager().registerEvents(new ElytraPVPFlag(), this);
+                getServer().getPluginManager().registerEvents(new EnderChestFlag(), this);
+        }
+
+        public static CVFlags getInstance() {
+                return instance;
+        }
 }

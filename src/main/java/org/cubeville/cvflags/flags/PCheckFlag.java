@@ -22,55 +22,55 @@ import java.util.Objects;
 
 public class PCheckFlag implements CommandExecutor {
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player) || !command.getName().equalsIgnoreCase("ps")) return true;
-        Player player = (Player) sender;
-        if (!player.hasPermission("cvflags.pcheck")) {
-            player.sendMessage("§cYou do not have permission to run this command");
-            return true;
-        }
+        @Override
+        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+                if (!(sender instanceof Player) || !command.getName().equalsIgnoreCase("ps")) return true;
+                Player player = (Player) sender;
+                if (!player.hasPermission("cvflags.pcheck")) {
+                        player.sendMessage("§cYou do not have permission to run this command");
+                        return true;
+                }
 
-        // okay now the real work begins
-        Collection<String> flagResults = (Collection<String>) CVFlags.getFlagValue(Flags.PLAYER_CHECK, player);
-        if (flagResults.size() == 0) {
-            player.sendMessage("§cYou must be standing in a region with a valid pcheck flag!");
-            return true;
-        }
-        String checkingRgName = flagResults.stream().findFirst().get();
-        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        ProtectedRegion region = Objects.requireNonNull(container.get(BukkitAdapter.adapt(player.getWorld()))).getRegion(checkingRgName);
-        if (region == null) {
-            player.sendMessage("§cThe pcheck flag does not point to a valid region in this world (it points to " + checkingRgName + " instead)");
-            return true;
-        }
+                // okay now the real work begins
+                Collection<String> flagResults = (Collection<String>) CVFlags.getFlagValue(Flags.PLAYER_CHECK, player);
+                if (flagResults.size() == 0) {
+                        player.sendMessage("§cYou must be standing in a region with a valid pcheck flag!");
+                        return true;
+                }
+                String checkingRgName = flagResults.stream().findFirst().get();
+                RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+                ProtectedRegion region = Objects.requireNonNull(container.get(BukkitAdapter.adapt(player.getWorld()))).getRegion(checkingRgName);
+                if (region == null) {
+                        player.sendMessage("§cThe pcheck flag does not point to a valid region in this world (it points to " + checkingRgName + " instead)");
+                        return true;
+                }
 
-        // loop over players and determine which ones are in the region
-        List<String> playerNames = new ArrayList<>();
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (player.equals(p) || !p.getWorld().equals(player.getWorld())) continue;
-            Location loc = BukkitAdapter.adapt(p.getLocation());
-            RegionQuery query = container.createQuery();
-            ApplicableRegionSet set = query.getApplicableRegions(loc);
-            for (ProtectedRegion rg : set) {
-                if (!rg.equals(region)) continue;
-                playerNames.add(p.getDisplayName());
-                break;
-            }
-        }
+                // loop over players and determine which ones are in the region
+                List<String> playerNames = new ArrayList<>();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                        if (player.equals(p) || !p.getWorld().equals(player.getWorld())) continue;
+                        Location loc = BukkitAdapter.adapt(p.getLocation());
+                        RegionQuery query = container.createQuery();
+                        ApplicableRegionSet set = query.getApplicableRegions(loc);
+                        for (ProtectedRegion rg : set) {
+                                if (!rg.equals(region)) continue;
+                                playerNames.add(p.getDisplayName());
+                                break;
+                        }
+                }
 
-        player.sendMessage("§bPlayers left: §e§l" + playerNames.size());
-        if (playerNames.size() == 0) return true;
-        StringBuilder usernameMsg = new StringBuilder("§3");
-        for (int i = 0; i < playerNames.size(); i++) {
-            if (i == (playerNames.size() - 1) && i != 0) {
-                usernameMsg.append(" and ");
-            } else if (i != 0) {
-                usernameMsg.append(", ");
-            }
-            usernameMsg.append(playerNames.get(i));
+                player.sendMessage("§bPlayers left: §e§l" + playerNames.size());
+                if (playerNames.size() == 0) return true;
+                StringBuilder usernameMsg = new StringBuilder("§3");
+                for (int i = 0; i < playerNames.size(); i++) {
+                        if (i == (playerNames.size() - 1) && i != 0) {
+                                usernameMsg.append(" and ");
+                        } else if (i != 0) {
+                                usernameMsg.append(", ");
+                        }
+                        usernameMsg.append(playerNames.get(i));
+                }
+                player.sendMessage(usernameMsg.toString());
+                return true;
         }
-        player.sendMessage(usernameMsg.toString());
-        return true;
-    }
 }
