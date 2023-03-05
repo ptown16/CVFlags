@@ -14,10 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.cubeville.cvflags.flags.DropperFlag;
-import org.cubeville.cvflags.flags.ElytraPVPFlag;
-import org.cubeville.cvflags.flags.EnderChestFlag;
-import org.cubeville.cvflags.flags.PCheckFlag;
+import org.cubeville.cvflags.flags.*;
 
 import java.lang.reflect.Field;
 
@@ -45,7 +42,7 @@ public final class CVFlags extends JavaPlugin implements Listener {
                 return query.queryAllValues(BukkitAdapter.adapt(location), localPlayer, flag);
         }
 
-        private static RegionQuery getRegionQuery() {
+        public static RegionQuery getRegionQuery() {
                 RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
                 return container.createQuery();
         }
@@ -77,6 +74,7 @@ public final class CVFlags extends JavaPlugin implements Listener {
                 getServer().getPluginManager().registerEvents(new DropperFlag(), this);
                 getServer().getPluginManager().registerEvents(new ElytraPVPFlag(), this);
                 getServer().getPluginManager().registerEvents(new EnderChestFlag(), this);
+                getServer().getPluginManager().registerEvents(new LocalDeathMessageFlag(), this);
         }
 
         public static CVFlags getInstance() {
