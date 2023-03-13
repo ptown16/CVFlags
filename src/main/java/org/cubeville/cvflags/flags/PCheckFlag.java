@@ -8,6 +8,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -48,6 +49,8 @@ public class PCheckFlag implements CommandExecutor {
                 // loop over players and determine which ones are in the region
                 List<String> playerNames = new ArrayList<>();
                 for (Player p : Bukkit.getOnlinePlayers()) {
+                        if (p.isFlying()) continue;
+                        if (List.of(GameMode.CREATIVE, GameMode.SPECTATOR).contains(player.getGameMode())) continue;
                         if (player.equals(p) || !p.getWorld().equals(player.getWorld())) continue;
                         Location loc = BukkitAdapter.adapt(p.getLocation());
                         RegionQuery query = container.createQuery();
