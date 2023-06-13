@@ -9,6 +9,5 @@ public final class Flags {
         public final static StateFlag LOCAL_DEATH_MESSAGE = new StateFlag("local-death-message", false);
         public final static StateFlag ENDER_CHEST = new StateFlag("ender-chest", true);
         public final static StringFlag PLAYER_CHECK = new StringFlag("pcheck");
-        public final static StateFlag DISMOUNT = new StateFlag("dismount", true);
         public final static StateFlag EXPLOSION_DAMAGE = new StateFlag("explosion-damage", true);
 }
