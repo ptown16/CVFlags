@@ -50,6 +50,7 @@ public class PCheckFlag implements CommandExecutor {
                 List<String> playerNames = new ArrayList<>();
                 for (Player p : Bukkit.getOnlinePlayers()) {
                         if (p.isFlying()) continue;
+                        if (p.isDead()) continue;
                         if (List.of(GameMode.CREATIVE, GameMode.SPECTATOR).contains(p.getGameMode())) continue;
                         if (player.equals(p) || !p.getWorld().equals(player.getWorld())) continue;
                         Location loc = BukkitAdapter.adapt(p.getLocation());
