@@ -10,4 +10,5 @@ public final class Flags {
         public final static StateFlag ENDER_CHEST = new StateFlag("ender-chest", true);
         public final static StringFlag PLAYER_CHECK = new StringFlag("pcheck");
         public final static StateFlag EXPLOSION_DAMAGE = new StateFlag("explosion-damage", true);
+        public final static StateFlag ABNORMAL_ENTITY_RIDE = new StateFlag("abnormal-entity-ride", false);
 }

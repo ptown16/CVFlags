@@ -76,6 +76,7 @@ public final class CVFlags extends JavaPlugin implements Listener {
                 getServer().getPluginManager().registerEvents(new EnderChestFlag(), this);
                 getServer().getPluginManager().registerEvents(new LocalDeathMessageFlag(), this);
                 getServer().getPluginManager().registerEvents(new ExplosionDamageFlag(), this);
+                getServer().getPluginManager().registerEvents(new AbnormalEntityRideFlag(), this);
         }
 
         public static CVFlags getInstance() {
